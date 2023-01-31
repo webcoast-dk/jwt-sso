@@ -1,7 +1,7 @@
 {
     "name": "webcoast/jwt-sso",
     "title": "JWT SSO",
-    "description": "Single Sign-On based on JSON Web Token",
+    "description": "Single Sign-On based on JSON Web Token for TYPO3 CMS",
     "keywords": ["typo3", "cms", "login", "sso", "jwt"],
     "type": "typo3-cms-extension",
     "require": {
