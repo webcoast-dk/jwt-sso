@@ -2,6 +2,7 @@
     "name": "webcoast/jwt-sso",
     "title": "JWT SSO",
     "description": "Single Sign-On based on JSON Web Token",
+    "keywords": ["typo3", "cms", "login", "sso", "jwt"],
     "type": "typo3-cms-extension",
     "require": {
         "php": "^7.4 || ^8.0",
@@ -12,8 +13,7 @@
         "web-token/jwt-key-mgmt": "^v2.2",
         "web-token/jwt-nested-token": "^v2.2",
         "web-token/jwt-signature-algorithm-rsa": "^v2.2",
-        "web-token/jwt-encryption-algorithm-rsa": "^v2.2",
-        "web-token/jwt-encryption-algorithm-aesgcm": "^v2.2"
+        "web-token/jwt-encryption-algorithm-rsa": "^v2.2"
     },
     "license": "GPL-3.0-or-later",
     "autoload": {
