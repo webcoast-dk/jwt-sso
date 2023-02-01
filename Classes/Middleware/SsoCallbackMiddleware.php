@@ -49,7 +49,6 @@ class SsoCallbackMiddleware implements MiddlewareInterface, LoggerAwareInterface
                 $_POST['user'] = 'sso';
                 $_POST['pass'] = json_encode($payload);
             }
-            // return new RedirectResponse($site->getBase());
         }
 
         return $handler->handle($request);
