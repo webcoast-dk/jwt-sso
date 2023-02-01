@@ -6,6 +6,16 @@
             <trans-unit id="fe_users.role_name">
                 <source>Role name</source>
             </trans-unit>
+
+            <trans-unit id="site_language.palettes.jwt-sso">
+                <source>SSO routes</source>
+            </trans-unit>
+            <trans-unit id="site_language.login_route">
+                <source>Login route</source>
+            </trans-unit>
+            <trans-unit id="site_language.logout_route">
+                <source>Logout route</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

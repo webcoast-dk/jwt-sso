@@ -15,15 +15,17 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Http\RedirectResponse;
+use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Session\UserSessionManager;
-use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SsoRedirectMiddleware implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if ($request->getUri()->getPath() === '/login') {
+        $language = $request->getAttribute('language');
+        $uri = new Uri(rtrim((string) $language->getBase(), '/') . '/' . ltrim($language->toArray()['jwtsso_login_route'], '/'));
+        if ($request->getUri()->getPath() === $uri->getPath()) {
             // Login is explicitly requested
             return $this->redirectToSso($request);
         } else {
@@ -40,14 +42,14 @@ class SsoRedirectMiddleware implements MiddlewareInterface
 
     protected function redirectToSso(ServerRequestInterface $request): RedirectResponse
     {
-        $site = $request->getAttribute('site');
+        $language = $request->getAttribute('language');
         $extensionConfig = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('jwt_sso');
         $clientPrivateKey = JWKFactory::createFromKeyFile($extensionConfig['client_private_key']);
         $referrer = $request->getHeader('Referer')[0] ?? null;
 
         $builder = new JWSBuilder(new AlgorithmManager([new RS256()]));
         $jws = $builder->create()
-            ->withPayload(json_encode(['iss' => $extensionConfig['client_identifier'], 'action' => 'login', 'redirect_url' => $site->getBase() . 'sso/auth?token=%s&redirect_url=' . ($referrer ?? (string) $site->getBase())]))
+            ->withPayload(json_encode(['iss' => $extensionConfig['client_identifier'], 'action' => 'login', 'redirect_url' => rtrim((string) $language->getBase(), '/') . SsoCallbackMiddleware::SSO_AUTH_URL . '?token=%s&redirect_url=' . ($referrer ?? (string) $language->getBase())]))
             ->addSignature($clientPrivateKey, ['alg' => 'RS256'])
             ->build();
 
