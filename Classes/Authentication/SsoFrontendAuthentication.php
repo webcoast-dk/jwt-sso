@@ -8,6 +8,7 @@ use TYPO3\CMS\Core\Authentication\AuthenticationService;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Session\UserSession;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use WEBcoast\JwtSso\Api\Client;
@@ -76,6 +77,10 @@ class SsoFrontendAuthentication extends AuthenticationService
                 $dataHandler->process_datamap();
             }
             $this->restoreBackendUser();
+
+            if ($this->authInfo['session'] instanceof UserSession) {
+                $this->authInfo['session']->set('sso_id', $userData['id']);
+            }
 
             return $this->fetchUserRecord($userData['email']);
         } catch (ApiResponseException $e) {
