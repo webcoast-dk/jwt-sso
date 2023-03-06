@@ -16,12 +16,14 @@ class AfterLoginRedirectMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $language = $request->getAttribute('language');
-        $uri = new Uri(rtrim((string) $language->getBase(), '/') . SsoCallbackMiddleware::SSO_AUTH_URL);
-        if ($request->getUri()->getPath() === $uri->getPath()) {
-            if (!empty($redirectUrl = $request->getQueryParams()['redirect_url'] ?? null)) {
-                return new RedirectResponse($redirectUrl);
+        if ($language) {
+            $uri = new Uri(rtrim((string) $language->getBase(), '/') . SsoCallbackMiddleware::SSO_AUTH_URL);
+            if ($request->getUri()->getPath() === $uri->getPath()) {
+                if (!empty($redirectUrl = $request->getQueryParams()['redirect_url'] ?? null)) {
+                    return new RedirectResponse($redirectUrl);
+                }
+                return new RedirectResponse($request->getAttribute('site')->getBase());
             }
-            return new RedirectResponse($request->getAttribute('site')->getBase());
         }
 
         return $handler->handle($request);

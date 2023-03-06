@@ -33,21 +33,23 @@ class SsoCallbackMiddleware implements MiddlewareInterface, LoggerAwareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $language = $request->getAttribute('language');
-        $uri = new Uri(rtrim((string) $language->getBase(), '/') . self::SSO_AUTH_URL);
-        if ($request->getUri()->getPath() === $uri->getPath() && !empty($token = $request->getQueryParams()['token'] ?? null)) {
-            $extensionConfig = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('jwt_sso');
-            $serverPublicKey = JWKFactory::createFromKeyFile($extensionConfig['server_public_key']);
+        if ($language) {
+            $uri = new Uri(rtrim((string) $language->getBase(), '/') . self::SSO_AUTH_URL);
+            if ($request->getUri()->getPath() === $uri->getPath() && !empty($token = $request->getQueryParams()['token'] ?? null)) {
+                $extensionConfig = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('jwt_sso');
+                $serverPublicKey = JWKFactory::createFromKeyFile($extensionConfig['server_public_key']);
 
-            $algorithmManager = new AlgorithmManager([new RS256()]);
-            $verifier = new JWSVerifier($algorithmManager);
-            $serializer = new JWSSerializerManager([new CompactSerializer()]);
-            $requestJws = $serializer->unserialize($token);
-            $payload = json_decode($requestJws->getPayload(), true);
+                $algorithmManager = new AlgorithmManager([new RS256()]);
+                $verifier = new JWSVerifier($algorithmManager);
+                $serializer = new JWSSerializerManager([new CompactSerializer()]);
+                $requestJws = $serializer->unserialize($token);
+                $payload = json_decode($requestJws->getPayload(), true);
 
-            if ($verifier->verifyWithKey($requestJws, $serverPublicKey, 0)) {
-                $_POST['logintype'] = LoginType::LOGIN;
-                $_POST['user'] = 'sso';
-                $_POST['pass'] = json_encode($payload);
+                if ($verifier->verifyWithKey($requestJws, $serverPublicKey, 0)) {
+                    $_POST['logintype'] = LoginType::LOGIN;
+                    $_POST['user'] = 'sso';
+                    $_POST['pass'] = json_encode($payload);
+                }
             }
         }
 

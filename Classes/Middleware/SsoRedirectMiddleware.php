@@ -24,16 +24,19 @@ class SsoRedirectMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $language = $request->getAttribute('language');
-        $uri = new Uri(rtrim((string) $language->getBase(), '/') . '/' . ltrim($language->toArray()['jwtsso_login_route'], '/'));
-        if ($request->getUri()->getPath() === $uri->getPath()) {
-            // Login is explicitly requested
-            return $this->redirectToSso($request);
-        } else {
-            $sessionManager = UserSessionManager::create('FE');
-            $session = $sessionManager->createFromRequestOrAnonymous($request, $GLOBALS['TYPO3_CONF_VARS']['FE']['cookieName']);
-            if ($sessionManager->hasExpired($session)) {
-                // Session is expired, re-authenticate with the SSO backend
+        if ($language) {
+            $loginUri = new Uri(rtrim((string) $language->getBase(), '/') . '/' . ltrim($language->toArray()['jwtsso_login_route'], '/'));
+            $callbackUri = new Uri(rtrim((string) $language->getBase(), '/') . SsoCallbackMiddleware::SSO_AUTH_URL);
+            if ($request->getUri()->getPath() === $loginUri->getPath()) {
+                // Login is explicitly requested
                 return $this->redirectToSso($request);
+            } elseif ($request->getUri()->getPath() !== $callbackUri->getPath()) {
+                $sessionManager = UserSessionManager::create('FE');
+                $session = $sessionManager->createFromRequestOrAnonymous($request, $GLOBALS['TYPO3_CONF_VARS']['FE']['cookieName']);
+                if ($sessionManager->hasExpired($session)) {
+                    // Session is expired, re-authenticate with the SSO backend
+                    return $this->redirectToSso($request);
+                }
             }
         }
 

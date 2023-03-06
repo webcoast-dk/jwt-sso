@@ -17,15 +17,17 @@ class SsoLogoutMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $language = $request->getAttribute('language');
-        $uri = new Uri(rtrim((string) $language->getBase(), '/') . '/' . ltrim($language->toArray()['jwtsso_logout_route'], '/'));
-        if ($request->getUri()->getPath() === $uri->getPath()) {
-            $sessionManager = UserSessionManager::create('FE');
-            $session = $sessionManager->createFromRequestOrAnonymous($request, $GLOBALS['TYPO3_CONF_VARS']['FE']['cookieName']);
-            $sessionManager->removeSession($session);
-            $referrer = $request->getHeader('Referer')[0];
-            $site = $request->getAttribute('site');
+        if ($language) {
+            $uri = new Uri(rtrim((string) $language->getBase(), '/') . '/' . ltrim($language->toArray()['jwtsso_logout_route'], '/'));
+            if ($request->getUri()->getPath() === $uri->getPath()) {
+                $sessionManager = UserSessionManager::create('FE');
+                $session = $sessionManager->createFromRequestOrAnonymous($request, $GLOBALS['TYPO3_CONF_VARS']['FE']['cookieName']);
+                $sessionManager->removeSession($session);
+                $referrer = $request->getHeader('Referer')[0];
+                $site = $request->getAttribute('site');
 
-            return new RedirectResponse($referrer ?? $site->getBase());
+                return new RedirectResponse($referrer ?? $site->getBase());
+            }
         }
 
         return $handler->handle($request);
