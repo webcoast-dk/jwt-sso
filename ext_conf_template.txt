@@ -1,1 +1,2 @@
-# Needs to be here, to make config work in TYPO3 CMS 10
+# cat=Basic; type=boolean; label=Enable redirect to SSO login on expired session
+enableRedirectOnExpiredSession = 0

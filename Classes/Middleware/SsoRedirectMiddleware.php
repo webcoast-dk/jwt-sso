@@ -31,11 +31,14 @@ class SsoRedirectMiddleware implements MiddlewareInterface
                 // Login is explicitly requested
                 return $this->redirectToSso($request);
             } elseif ($request->getUri()->getPath() !== $callbackUri->getPath()) {
-                $sessionManager = UserSessionManager::create('FE');
-                $session = $sessionManager->createFromRequestOrAnonymous($request, $GLOBALS['TYPO3_CONF_VARS']['FE']['cookieName']);
-                if ($sessionManager->hasExpired($session)) {
-                    // Session is expired, re-authenticate with the SSO backend
-                    return $this->redirectToSso($request);
+                $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('jwt_sso');
+                if ($extensionConfiguration['enableRedirectOnExpiredSession']) {
+                    $sessionManager = UserSessionManager::create('FE');
+                    $session = $sessionManager->createFromRequestOrAnonymous($request, $GLOBALS['TYPO3_CONF_VARS']['FE']['cookieName']);
+                    if ($sessionManager->hasExpired($session)) {
+                        // Session is expired, re-authenticate with the SSO backend
+                        return $this->redirectToSso($request);
+                    }
                 }
             }
         }
