@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace WEBcoast\JwtSso\Api;
 
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -23,7 +22,7 @@ class Client
 
     public function __construct()
     {
-        $extensionConfig = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('jwt_sso');
+        $extensionConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['jwt_sso'];
         $this->baseUrl = $extensionConfig['api']['base_url'];
         $this->accessToken = $extensionConfig['api']['access_token'];
         $this->basicAuthUser = $extensionConfig['api']['basic_auth']['user'] ?? null;

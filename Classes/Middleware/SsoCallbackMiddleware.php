@@ -18,9 +18,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Authentication\AbstractUserAuthentication;
 use TYPO3\CMS\Core\Authentication\LoginType;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Http\Uri;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SsoCallbackMiddleware implements MiddlewareInterface, LoggerAwareInterface
 {
@@ -36,7 +34,7 @@ class SsoCallbackMiddleware implements MiddlewareInterface, LoggerAwareInterface
         if ($language) {
             $uri = new Uri(rtrim((string) $language->getBase(), '/') . self::SSO_AUTH_URL);
             if ($request->getUri()->getPath() === $uri->getPath() && !empty($token = $request->getQueryParams()['token'] ?? null)) {
-                $extensionConfig = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('jwt_sso');
+                $extensionConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['jwt_sso'];
                 $serverPublicKey = JWKFactory::createFromKeyFile($extensionConfig['server_public_key']);
 
                 $algorithmManager = new AlgorithmManager([new RS256()]);

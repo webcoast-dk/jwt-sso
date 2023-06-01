@@ -49,7 +49,7 @@ class SsoRedirectMiddleware implements MiddlewareInterface
     protected function redirectToSso(ServerRequestInterface $request): RedirectResponse
     {
         $language = $request->getAttribute('language');
-        $extensionConfig = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('jwt_sso');
+        $extensionConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['jwt_sso'];
         $clientPrivateKey = JWKFactory::createFromKeyFile($extensionConfig['client_private_key']);
         $referrer = $request->getHeader('Referer')[0] ?? null;
 
