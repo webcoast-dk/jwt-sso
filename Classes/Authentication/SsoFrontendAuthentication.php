@@ -9,10 +9,12 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Session\UserSession;
+use TYPO3\CMS\Core\Session\UserSessionManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use WEBcoast\JwtSso\Api\Client;
 use WEBcoast\JwtSso\Exception\ApiResponseException;
+use WEBcoast\JwtSso\Hook\SessionDataHook;
 use WEBcoast\JwtSso\Repository\FrontendGroupRepository;
 use WEBcoast\JwtSso\Repository\FrontendUserRepository;
 
@@ -78,9 +80,7 @@ class SsoFrontendAuthentication extends AuthenticationService
             }
             $this->restoreBackendUser();
 
-            if ($this->authInfo['session'] instanceof UserSession) {
-                $this->authInfo['session']->set('sso_id', $userData['id']);
-            }
+            GeneralUtility::makeInstance(SessionDataHook::class)->setSsoUserId((int) $userData['id']);
 
             return $this->fetchUserRecord($userData['email']);
         } catch (ApiResponseException $e) {

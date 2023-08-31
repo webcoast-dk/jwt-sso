@@ -8,3 +8,5 @@
     'quality' => 80,
     'className' => \WEBcoast\JwtSso\Authentication\SsoFrontendAuthentication::class,
 ]);
+
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['postUserLookUp'][1693402120] = \WEBcoast\JwtSso\Hook\SessionDataHook::class . '->addUserIdToSession';
